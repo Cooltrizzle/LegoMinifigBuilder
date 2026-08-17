@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Wire up buttons
   document.getElementById("saveApiKeyBtn").addEventListener("click", saveApiKey);
-  document.getElementById("fetchFigBtn").addEventListener("click", fetchMinifigParts);
+  document.getElementById("fetchFigBtn").addEventListener("click", fetchMinifigSearch);
   document.getElementById("elementSearchBtn").addEventListener("click", fetchMinifigsByElement);
 });
 
