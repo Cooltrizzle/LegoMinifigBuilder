@@ -186,4 +186,35 @@ async function fetchMinifigsByElement() {
   } catch (err) {
     output.textContent = `Fetch error: ${err}`;
   }
+
+// ---------- SCRAPE BRICKLINK MINIFIG ID FROM REBRICKABLE PAGE ----------
+
+async function fetchBrickLinkFigID(figNum) {
+  const url = `https://rebrickable.com/minifigs/${figNum}/`;
+
+  try {
+    const html = await fetch(url).then(r => r.text());
+
+    // Find the __NEXT_DATA__ JSON block
+    const marker = '<script id="__NEXT_DATA__" type="application/json">';
+    const start = html.indexOf(marker);
+    if (start === -1) return null;
+
+    const jsonStart = start + marker.length;
+    const jsonEnd = html.indexOf('</script>', jsonStart);
+    const jsonText = html.substring(jsonStart, jsonEnd).trim();
+
+    const data = JSON.parse(jsonText);
+
+    // Navigate to the BrickLink ID
+    const bl = data?.props?.pageProps?.minifig?.external_ids?.BrickLink;
+    return bl ? bl[0] : null;
+
+  } catch (err) {
+    console.log("BrickLink scrape error:", err);
+    return null;
+  }
+}
+
+  
 }
