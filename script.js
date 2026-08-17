@@ -273,4 +273,28 @@ async function fetchMinifigsByElement() {
   } catch (err) {
     output.textContent = `Fetch error: ${err}`;
   }
+
+  //================================
+  // DOWNLOAD TRANSLATOR CSV
+  //================================
+  
+  function downloadTranslatorCSV() {
+  let csv = "rebrickable_id,name,img_url,num_parts,bricklink_id\n";
+
+  for (const id in translator) {
+    const t = translator[id];
+    csv += `${id},${t.name},${t.img_url},${t.num_parts},${t.bricklink_id}\n`;
+  }
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "translator.csv";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
 }
