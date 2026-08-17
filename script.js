@@ -32,10 +32,39 @@ async function fetchMinifigParts() {
   const apiKey = localStorage.getItem("rebrickable_api_key");
   const figNum = document.getElementById("figInput").value.trim();
   const output = document.getElementById("figOutput");
+  const summary = document.getElementById("figSummary");
 
   if (!apiKey) return output.textContent = "No API key saved.";
   if (!figNum) return output.textContent = "Enter a minifig ID.";
 
+  // ⭐ Fetch minifig metadata (name + image)
+  const metaUrl = `https://rebrickable.com/api/v3/lego/minifigs/${figNum}/?key=${apiKey}`;
+  let figName = "";
+  let figImg = "";
+
+  try {
+    const metaRes = await fetch(metaUrl);
+    if (metaRes.ok) {
+      const metaData = await metaRes.json();
+      figName = metaData.name || "";
+      figImg = metaData.set_img_url || "";
+    }
+  } catch (err) {
+    console.log("Metadata fetch error:", err);
+  }
+
+  // ⭐ Update summary box
+  summary.innerHTML = `
+    <div class="fig-summary-box">
+      <img src="${figImg}" alt="${figName}" class="fig-summary-img">
+      <div class="fig-summary-text">
+        <h2>${figName || "Minifig"}</h2>
+        <p><strong>Rebrickable ID:</strong> ${figNum}</p>
+      </div>
+    </div>
+  `;
+
+  // ⭐ Fetch parts
   const url = `https://rebrickable.com/api/v3/lego/minifigs/${figNum}/parts/?key=${apiKey}`;
 
   try {
@@ -69,20 +98,20 @@ async function fetchMinifigParts() {
       const p = item.part;
       const c = item.color;
 
-     // BrickLink part code
-  let blPart = "";
-  if (p.external_ids && p.external_ids.BrickLink) {
-    blPart = p.external_ids.BrickLink.join(", ");
-  }
+      // BrickLink part code
+      let blPart = "";
+      if (p.external_ids && p.external_ids.BrickLink) {
+        blPart = p.external_ids.BrickLink.join(", ");
+      }
 
-  // BrickLink colour code
-  let blColorId = "";
-  let blColorName = "";
-  if (c.external_ids && c.external_ids.BrickLink) {
-    blColorId = c.external_ids.BrickLink.ext_ids[0];
-    blColorName = c.external_ids.BrickLink.ext_descrs[0][0];
-  }
-     
+      // BrickLink colour code
+      let blColorId = "";
+      let blColorName = "";
+      if (c.external_ids && c.external_ids.BrickLink) {
+        blColorId = c.external_ids.BrickLink.ext_ids[0];
+        blColorName = c.external_ids.BrickLink.ext_descrs[0][0];
+      }
+
       html += `
         <tr>
           <td><img src="${p.part_img_url}" alt=""></td>
