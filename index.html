@@ -1,22 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Minifig Completion Tool</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <title>Minifig Parts Tool</title>
+  <script defer src="script.js"></script>
 </head>
-
 <body>
-  <h1>Minifig Completion Tool</h1>
+  <h1>Minifig Parts Lookup</h1>
 
-  <input id="partInput" placeholder="Enter torso part number (BrickLink)">
-  <button onclick="lookupPart()">Search</button>
-  <button onclick="testBrickLink()">Test BrickLink API</button>
+  <div>
+    <label>Rebrickable API Key:
+      <input type="password" id="apiKeyInput">
+    </label>
+    <button id="saveApiKeyBtn">Save API Key</button>
+  </div>
 
+  <div>
+    <label>Minifig ID (e.g. fig-000001):
+      <input type="text" id="figInput">
+    </label>
+    <button id="fetchBtn">Fetch Parts</button>
+  </div>
 
+  <h2>Parts</h2>
   <pre id="output"></pre>
-
-  <script src="script.js"></script>
 </body>
 </html>
