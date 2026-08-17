@@ -1,11 +1,13 @@
-// Load saved key and wire up events
 document.addEventListener("DOMContentLoaded", () => {
+
+  // Load saved API key
   const savedKey = localStorage.getItem("rebrickable_api_key");
   if (savedKey) {
     document.getElementById("apiKeyInput").value = savedKey;
-    document.getElementById("apiKeyStatus").textContent = "API key loaded from this browser.";
+    document.getElementById("apiKeyStatus").textContent = "API key loaded.";
   }
 
+  // Wire up buttons
   document.getElementById("saveApiKeyBtn").addEventListener("click", saveApiKey);
   document.getElementById("fetchFigBtn").addEventListener("click", fetchMinifigParts);
   document.getElementById("elementSearchBtn").addEventListener("click", fetchMinifigsByElement);
@@ -19,8 +21,9 @@ function saveApiKey() {
     status.textContent = "Please enter an API key.";
     return;
   }
+
   localStorage.setItem("rebrickable_api_key", key);
-  status.textContent = "API key saved in this browser.";
+  status.textContent = "API key saved.";
 }
 
 // ---------- Minifig → Parts ----------
@@ -30,32 +33,20 @@ async function fetchMinifigParts() {
   const figNum = document.getElementById("figInput").value.trim();
   const output = document.getElementById("figOutput");
 
-  if (!apiKey) {
-    output.textContent = "No API key saved.";
-    return;
-  }
-  if (!figNum) {
-    output.textContent = "Please enter a minifig ID (e.g. fig-000001).";
-    return;
-  }
+  if (!apiKey) return output.textContent = "No API key saved.";
+  if (!figNum) return output.textContent = "Enter a minifig ID.";
 
   const url = `https://rebrickable.com/api/v3/lego/minifigs/${figNum}/parts/?key=${apiKey}`;
 
   try {
     output.textContent = "Loading...";
     const res = await fetch(url);
-    if (!res.ok) {
-      output.textContent = `Error: ${res.status} ${res.statusText}`;
-      return;
-    }
+    if (!res.ok) return output.textContent = `Error: ${res.status}`;
 
     const data = await res.json();
     const parts = data.results;
 
-    if (!parts || parts.length === 0) {
-      output.textContent = "No parts found for this minifig.";
-      return;
-    }
+    if (!parts.length) return output.textContent = "No parts found.";
 
     let html = `
       <table>
@@ -78,7 +69,7 @@ async function fetchMinifigParts() {
 
       html += `
         <tr>
-          <td>${p.part_img_url ? `<img src="${p.part_img_url}" alt="${p.part_num}">` : ""}</td>
+          <td><img src="${p.part_img_url}" alt=""></td>
           <td>${p.part_num}</td>
           <td>${p.name}</td>
           <td>${c.name}</td>
@@ -103,32 +94,20 @@ async function fetchMinifigsByElement() {
   const elementId = document.getElementById("elementInput").value.trim();
   const output = document.getElementById("elementOutput");
 
-  if (!apiKey) {
-    output.textContent = "No API key saved.";
-    return;
-  }
-  if (!elementId) {
-    output.textContent = "Please enter an element ID.";
-    return;
-  }
+  if (!apiKey) return output.textContent = "No API key saved.";
+  if (!elementId) return output.textContent = "Enter an element ID.";
 
   const url = `https://rebrickable.com/api/v3/lego/elements/${elementId}/minifigs/?key=${apiKey}`;
 
   try {
     output.textContent = "Loading...";
     const res = await fetch(url);
-    if (!res.ok) {
-      output.textContent = `Error: ${res.status} ${res.statusText}`;
-      return;
-    }
+    if (!res.ok) return output.textContent = `Error: ${res.status}`;
 
     const data = await res.json();
     const figs = data.results;
 
-    if (!figs || figs.length === 0) {
-      output.textContent = "No minifigs use this element.";
-      return;
-    }
+    if (!figs.length) return output.textContent = "No minifigs use this element.";
 
     let html = `
       <table>
