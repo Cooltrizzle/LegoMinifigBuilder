@@ -10,22 +10,18 @@ let minfigs = {};
 // LOAD CSV: MINFIGS
 // =========================
 
-function loadMinfigsCSV(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    const rows = reader.result.split("\n").slice(1); // skip header
-    for (const row of rows) {
-      if (!row.trim()) continue;
-      const cols = row.split(",");
-      const id = cols[0];
-      const name = cols[1];
-      const num_parts = cols[2];
-      const img_url = cols[3];
-      minfigs[id] = { name, img_url, num_parts };
-    }
-    console.log("Minifigs loaded:", minfigs);
-  };
-  reader.readAsText(file);
+function loadMinfigsText(text) {
+  const rows = text.split("\n").slice(1);
+  for (const row of rows) {
+    if (!row.trim()) continue;
+    const cols = row.split(",");
+    const id = cols[0];
+    const name = cols[1];
+    const num_parts = cols[2];
+    const img_url = cols[3];
+    minfigs[id] = { name, img_url, num_parts };
+  }
+  console.log("Minifigs loaded:", minfigs);
 }
 
 
@@ -33,23 +29,19 @@ function loadMinfigsCSV(file) {
 // LOAD CSV: TRANSLATOR
 // =========================
 
-function loadTranslatorCSV(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    const rows = reader.result.split("\n").slice(1); // skip header
-    for (const row of rows) {
-      if (!row.trim()) continue;
-      const cols = row.split(",");
-      const id = cols[0];
-      const name = cols[1];
-      const img_url = cols[2];
-      const num_parts = cols[3];
-      const bricklink_id = cols[4];
-      translator[id] = { name, img_url, num_parts, bricklink_id };
-    }
-    console.log("Translator loaded:", translator);
-  };
-  reader.readAsText(file);
+function loadTranslatorText(text) {
+  const rows = text.split("\n").slice(1);
+  for (const row of rows) {
+    if (!row.trim()) continue;
+    const cols = row.split(",");
+    const id = cols[0];
+    const name = cols[1];
+    const img_url = cols[2];
+    const num_parts = cols[3];
+    const bricklink_id = cols[4];
+    translator[id] = { name, img_url, num_parts, bricklink_id };
+  }
+  console.log("Translator loaded:", translator);
 }
 
 
@@ -66,22 +58,21 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("apiKeyStatus").textContent = "API key loaded.";
   }
 
-  // Buttons
+  // Wire up buttons
   document.getElementById("saveApiKeyBtn").addEventListener("click", saveApiKey);
   document.getElementById("fetchFigBtn").addEventListener("click", fetchMinifigSearch);
   document.getElementById("elementSearchBtn").addEventListener("click", fetchMinifigsByElement);
 
-  // CSV loaders
-  document.getElementById("loadTranslatorBtn").addEventListener("click", () => {
-    const file = document.getElementById("translatorFile").files[0];
-    if (file) loadTranslatorCSV(file);
-  });
+  // ⭐ AUTO-LOAD CSV FILES FROM /data
+  fetch("data/translator.csv")
+    .then(r => r.text())
+    .then(text => loadTranslatorText(text))
+    .catch(err => console.error("Translator CSV load error:", err));
 
-  document.getElementById("loadMinfigsBtn").addEventListener("click", () => {
-    const file = document.getElementById("minfigsFile").files[0];
-    if (file) loadMinfigsCSV(file);
-  });
-
+  fetch("data/minfigs.csv")
+    .then(r => r.text())
+    .then(text => loadMinfigsText(text))
+    .catch(err => console.error("Minfigs CSV load error:", err));
 });
 
 
