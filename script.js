@@ -26,39 +26,10 @@ function saveApiKey() {
   status.textContent = "API key saved.";
 }
 
-// ---------- SCRAPE BRICKLINK MINIFIG ID FROM REBRICKABLE PAGE ----------
-
-async function fetchBrickLinkFigID(figNum) {
-  const target = `https://rebrickable.com/minifigs/${figNum}`;
-  const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`;
-
-  try {
-    const html = await fetch(url).then(r => r.text());
-
-console.log("SCRAPER HTML:", html.slice(0, 500));
-
-    
-    const marker = '"minifig":{';
-    const start = html.indexOf(marker);
-    if (start === -1) return null;
-
-    const scriptStart = html.lastIndexOf('<script', start);
-    const jsonStart = html.indexOf('>', scriptStart) + 1;
-    const jsonEnd = html.indexOf('</script>', jsonStart);
-    const jsonText = html.substring(jsonStart, jsonEnd).trim();
-
-    const data = JSON.parse(jsonText);
-
-    const bl = data?.props?.pageProps?.minifig?.external_ids?.BrickLink;
-    return bl ? bl[0] : null;
-
-  } catch (err) {
-    console.log("BrickLink scrape error:", err);
-    return null;
-  }
-}
 
 
+// ⭐ SCRAPER REMOVED — NO LONGER USED
+// (fetchBrickLinkFigID deleted completely)
 
 
 // ---------- Minifig → Parts ----------
@@ -88,20 +59,16 @@ async function fetchMinifigParts() {
     console.log("Metadata fetch error:", err);
   }
 
-  // ⭐ Update summary box (NOW WITH BRICKLINK ID)
-  // ⭐ Fetch BrickLink Minifig ID via scraping
-const bricklinkFigID = await fetchBrickLinkFigID(figNum);
-
-// ⭐ Update summary box
-summary.innerHTML = `
-  <div class="fig-summary-box">
-    <img src="${figImg}" alt="${figName}" class="fig-summary-img">
-    <div class="fig-summary-text">
-      <h2>${figName || "Minifig"}</h2>
-      <p><strong>BrickLink ID:</strong> ${bricklinkFigID || "Not Available"}</p>
-      <p><strong>Rebrickable ID:</strong> ${figNum}</p>
+  // ⭐ Update summary box (BrickLink ID removed for now)
+  summary.innerHTML = `
+    <div class="fig-summary-box">
+      <img src="${figImg}" alt="${figName}" class="fig-summary-img">
+      <div class="fig-summary-text">
+        <h2>${figName || "Minifig"}</h2>
+        <p><strong>BrickLink ID:</strong> Not Assigned</p>
+        <p><strong>Rebrickable ID:</strong> ${figNum}</p>
+      </div>
     </div>
-  </div>
   `;
 
   // ⭐ Fetch parts
@@ -225,8 +192,4 @@ async function fetchMinifigsByElement() {
   } catch (err) {
     output.textContent = `Fetch error: ${err}`;
   }
-
-
-
-  
 }
