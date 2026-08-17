@@ -108,31 +108,32 @@ async function fetchMinifigSearch() {
   if (!figNum) return output.textContent = "Enter a minifig ID.";
 
   // =========================
-  // USE TRANSLATOR.CSV DATA
-  // =========================
+// USE TRANSLATOR.CSV DATA
+// =========================
 
-  const t = translator[figNum];
+const t = translator[figNum];
 
-  const figName = t?.name || "Unknown Minifig";
-  const figImg = t?.img_url || "";
-  const bricklinkFigID = t?.bricklink_id || "Not Assigned";
-  const numParts = t?.num_parts || "";
+const figName = t?.name || "Unknown Minifig";
+const figImg = t?.img_url || "";
+const bricklinkFigID = t?.bricklink_id || "Not Assigned";
+const numParts = t?.num_parts || "";
 
-  // =========================
-  // SUMMARY BOX
-  // =========================
+// =========================
+// SUMMARY BOX
+// =========================
 
-  summary.innerHTML = `
-    <div class="fig-summary-box">
-      <img src="${figImg}" alt="${figName}" class="fig-summary-img">
-      <div class="fig-summary-text">
-        <h2>${figName}</h2>
-        <p><strong>BrickLink ID:</strong> ${bricklinkFigID}</p>
-        <p><strong>Rebrickable ID:</strong> ${figNum}</p>
-        <p><strong>Number of Parts:</strong> ${numParts}</p>
-      </div>
+summary.innerHTML = `
+  <div class="fig-summary-box">
+    <img src="${figImg}" alt="${figName}" class="fig-summary-img">
+    <div class="fig-summary-text">
+      <h2>${figName}</h2>
+      <p><strong>BrickLink ID:</strong> ${bricklinkFigID}</p>
+      <p><strong>Rebrickable ID:</strong> ${figNum}</p>
+      <p><strong>Number of Parts:</strong> ${numParts}</p>
     </div>
-  `;
+  </div>
+`;
+
 
   // =========================
   // FETCH PARTS FROM API
