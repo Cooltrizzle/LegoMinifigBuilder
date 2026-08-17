@@ -35,6 +35,9 @@ async function fetchBrickLinkFigID(figNum) {
   try {
     const html = await fetch(url).then(r => r.text());
 
+console.log("SCRAPER HTML:", html.slice(0, 500));
+
+    
     const marker = '"minifig":{';
     const start = html.indexOf(marker);
     if (start === -1) return null;
