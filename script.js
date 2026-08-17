@@ -53,12 +53,13 @@ async function fetchMinifigParts() {
     console.log("Metadata fetch error:", err);
   }
 
-  // ⭐ Update summary box
+  // ⭐ Update summary box (NOW WITH BRICKLINK ID)
   summary.innerHTML = `
     <div class="fig-summary-box">
       <img src="${figImg}" alt="${figName}" class="fig-summary-img">
       <div class="fig-summary-text">
         <h2>${figName || "Minifig"}</h2>
+        <p><strong>BrickLink ID:</strong> ${figNum}</p>
         <p><strong>Rebrickable ID:</strong> ${figNum}</p>
       </div>
     </div>
@@ -98,13 +99,11 @@ async function fetchMinifigParts() {
       const p = item.part;
       const c = item.color;
 
-      // BrickLink part code
       let blPart = "";
       if (p.external_ids && p.external_ids.BrickLink) {
         blPart = p.external_ids.BrickLink.join(", ");
       }
 
-      // BrickLink colour code
       let blColorId = "";
       let blColorName = "";
       if (c.external_ids && c.external_ids.BrickLink) {
@@ -133,6 +132,7 @@ async function fetchMinifigParts() {
     output.textContent = `Fetch error: ${err}`;
   }
 }
+
 
 // ---------- Element → Minifigs ----------
 
