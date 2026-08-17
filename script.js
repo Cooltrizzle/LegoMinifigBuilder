@@ -67,6 +67,20 @@ async function fetchMinifigParts() {
       const p = item.part;
       const c = item.color;
 
+     // BrickLink part code
+  let blPart = "";
+  if (p.external_ids && p.external_ids.BrickLink) {
+    blPart = p.external_ids.BrickLink.join(", ");
+  }
+
+  // BrickLink colour code
+  let blColorId = "";
+  let blColorName = "";
+  if (c.external_ids && c.external_ids.BrickLink) {
+    blColorId = c.external_ids.BrickLink.ext_ids[0];
+    blColorName = c.external_ids.BrickLink.ext_descrs[0][0];
+  }
+     
       html += `
         <tr>
           <td><img src="${p.part_img_url}" alt=""></td>
@@ -75,6 +89,8 @@ async function fetchMinifigParts() {
           <td>${c.name}</td>
           <td>${item.quantity}</td>
           <td>${item.element_id || ""}</td>
+          <td>${blPart}</td>
+          <td>${blColorId} (${blColorName})</td>
         </tr>
       `;
     }
