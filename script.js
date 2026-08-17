@@ -32,13 +32,19 @@ async function fetchBrickLinkFigID(figNum) {
   const url = `https://rebrickable.com/minifigs/${figNum}`;
 
   try {
-    const html = await fetch(url).then(r => r.text());
+    const html = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+      }
+    }).then(r => r.text());
 
-    const marker = '<script id="__NEXT_DATA__" type="application/json">';
+    // Find the JSON block more reliably
+    const marker = '"minifig":{';
     const start = html.indexOf(marker);
     if (start === -1) return null;
 
-    const jsonStart = start + marker.length;
+    const scriptStart = html.lastIndexOf('<script', start);
+    const jsonStart = html.indexOf('>', scriptStart) + 1;
     const jsonEnd = html.indexOf('</script>', jsonStart);
     const jsonText = html.substring(jsonStart, jsonEnd).trim();
 
@@ -52,6 +58,7 @@ async function fetchBrickLinkFigID(figNum) {
     return null;
   }
 }
+
 
 
 // ---------- Minifig → Parts ----------
