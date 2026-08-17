@@ -49,6 +49,21 @@
     <div id="apiKeyStatus"></div>
   </div>
 
+  <!-- ⭐ REQUIRED NEW SECTION -->
+  <div class="section">
+    <h2>Load Data Files</h2>
+
+    <label>Translator CSV:</label>
+    <input type="file" id="translatorFile">
+    <button id="loadTranslatorBtn">Load Translator</button>
+
+    <br><br>
+
+    <label>Minifigs CSV:</label>
+    <input type="file" id="minfigsFile">
+    <button id="loadMinfigsBtn">Load Minifigs</button>
+  </div>
+
   <div class="section">
     <h2>Minifig Search</h2>
     <label>
@@ -57,10 +72,10 @@
     </label>
     <button id="fetchFigBtn">Fetch Parts</button>
 
-    <!-- ⭐ NEW: Minifig Summary Box -->
+    <!-- ⭐ Minifig Summary Box -->
     <div id="figSummary"></div>
 
-    <!-- Existing parts table output -->
+    <!-- Parts table output -->
     <div id="figOutput"></div>
   </div>
 
