@@ -1,87 +1,54 @@
-// ===============================
-// BrickLink API Key Loader
-// ===============================
-function getBLKeys() {
-  return {
-    consumerKey: localStorage.getItem("bl_consumer_key"),
-    consumerSecret: localStorage.getItem("bl_consumer_secret"),
-    token: localStorage.getItem("bl_token"),
-    tokenSecret: localStorage.getItem("bl_token_secret")
-  };
+// script.js
+
+// Load saved key on page load
+document.addEventListener("DOMContentLoaded", () => {
+  const savedKey = localStorage.getItem("rebrickable_api_key");
+  if (savedKey) {
+    document.getElementById("apiKeyInput").value = savedKey;
+  }
+
+  document.getElementById("saveApiKeyBtn").addEventListener("click", saveApiKey);
+  document.getElementById("fetchBtn").addEventListener("click", fetchMinifigParts);
+});
+
+function saveApiKey() {
+  const key = document.getElementById("apiKeyInput").value.trim();
+  if (!key) {
+    alert("Please enter an API key.");
+    return;
+  }
+  localStorage.setItem("rebrickable_api_key", key);
+  alert("API key saved in this browser.");
 }
 
-// ===============================
-// OAuth 1.0a Signature Builder
-// ===============================
-function buildOAuthHeader(method, url) {
-  const keys = getBLKeys();
-
-  const nonce = Math.random().toString(36).substring(2);
-  const timestamp = Math.floor(Date.now() / 1000);
-
-  const params = {
-    oauth_consumer_key: keys.consumerKey,
-    oauth_token: keys.token,
-    oauth_nonce: nonce,
-    oauth_timestamp: timestamp,
-    oauth_signature_method: "HMAC-SHA1",
-    oauth_version: "1.0"
-  };
-
-  const baseString = method.toUpperCase() + "&" +
-    encodeURIComponent(url) + "&" +
-    encodeURIComponent(
-      Object.keys(params)
-        .sort()
-        .map(k => `${k}=${params[k]}`)
-        .join("&")
-    );
-
-  const signingKey = `${keys.consumerSecret}&${keys.tokenSecret}`;
-  const signature = CryptoJS.HmacSHA1(baseString, signingKey)
-    .toString(CryptoJS.enc.Base64);
-
-  const headerParams = {
-    ...params,
-    oauth_signature: signature
-  };
-
-  const header = "OAuth " + Object.keys(headerParams)
-    .map(k => `${k}="${headerParams[k]}"`)
-    .join(", ");
-
-  return header;
-}
-
-// ===============================
-// Test BrickLink API Call
-// ===============================
-async function testBrickLink() {
-  const url = "https://api.bricklink.com/api/store/v1/inventories";
-
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Authorization": buildOAuthHeader("GET", url)
-    }
-  });
-
-  const data = await response.json();
-  document.getElementById("output").textContent =
-    JSON.stringify(data, null, 2);
-}
-
-// ===============================
-// Your original lookup function
-// ===============================
-async function lookupPart() {
-  const partNo = document.getElementById("partInput").value.trim();
+async function fetchMinifigParts() {
+  const apiKey = localStorage.getItem("rebrickable_api_key");
+  const figNum = document.getElementById("figInput").value.trim();
   const output = document.getElementById("output");
 
-  if (!partNo) {
-    output.textContent = "Enter a part number.";
+  if (!apiKey) {
+    output.textContent = "No API key saved.";
+    return;
+  }
+  if (!figNum) {
+    output.textContent = "Please enter a minifig ID (e.g. fig-000001).";
     return;
   }
 
-  output.textContent = `Searching for part: ${partNo}`;
+  const url = `https://rebrickable.com/api/v3/lego/minifigs/${figNum}/parts/?key=${apiKey}`;
+
+  try {
+    output.textContent = "Loading...";
+    const res = await fetch(url);
+    if (!res.ok) {
+      output.textContent = `Error: ${res.status} ${res.statusText}`;
+      return;
+    }
+    const data = await res.json();
+
+    // Show raw results for now
+    output.textContent = JSON.stringify(data.results, null, 2);
+  } catch (err) {
+    output.textContent = `Fetch error: ${err}`;
+  }
 }
