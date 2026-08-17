@@ -72,6 +72,8 @@ if (savedKey) {
   document.getElementById("saveApiKeyBtn").addEventListener("click", saveApiKey);
   document.getElementById("fetchFigBtn").addEventListener("click", fetchMinifigSearch);
   document.getElementById("elementSearchBtn").addEventListener("click", fetchMinifigsByElement);
+  document.getElementById("updateTranslatorBtn").addEventListener("click", downloadTranslatorCSV);
+
 
   // ⭐ AUTO-LOAD CSV FILES FROM /data
   fetch("data/translator.csv")
