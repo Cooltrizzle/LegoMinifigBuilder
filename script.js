@@ -38,6 +38,8 @@ async function fetchBrickLinkFigID(figNum) {
       }
     }).then(r => r.text());
 
+    console.log("SCRAPER HTML:", html.substring(0, 500));
+
     // Find the JSON block more reliably
     const marker = '"minifig":{';
     const start = html.indexOf(marker);
