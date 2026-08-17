@@ -29,18 +29,12 @@ function saveApiKey() {
 // ---------- SCRAPE BRICKLINK MINIFIG ID FROM REBRICKABLE PAGE ----------
 
 async function fetchBrickLinkFigID(figNum) {
-  const url = `https://rebrickable.com/minifigs/${figNum}`;
+  const target = `https://rebrickable.com/minifigs/${figNum}`;
+  const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`;
 
   try {
-    const html = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-      }
-    }).then(r => r.text());
+    const html = await fetch(url).then(r => r.text());
 
-    console.log("SCRAPER HTML:", html.substring(0, 500));
-
-    // Find the JSON block more reliably
     const marker = '"minifig":{';
     const start = html.indexOf(marker);
     if (start === -1) return null;
@@ -60,6 +54,7 @@ async function fetchBrickLinkFigID(figNum) {
     return null;
   }
 }
+
 
 
 
