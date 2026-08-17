@@ -44,6 +44,13 @@ function loadTranslatorText(text) {
   console.log("Translator loaded:", translator);
 }
 
+//==========================
+// TOGGLE API KEY
+//==========================
+function toggleApiSection() {
+  const sec = document.getElementById("apiSection");
+  sec.style.display = sec.style.display === "none" ? "block" : "none";
+}
 
 // =========================
 // PAGE LOAD
@@ -52,11 +59,14 @@ function loadTranslatorText(text) {
 document.addEventListener("DOMContentLoaded", () => {
 
   // Load saved API key
-  const savedKey = localStorage.getItem("rebrickable_api_key");
-  if (savedKey) {
-    document.getElementById("apiKeyInput").value = savedKey;
-    document.getElementById("apiKeyStatus").textContent = "API key loaded.";
-  }
+const savedKey = localStorage.getItem("rebrickable_api_key");
+
+if (savedKey) {
+  document.getElementById("apiKeyStatus").textContent = "Key already loaded";
+} else {
+  document.getElementById("apiKeyStatus").textContent = "No key saved";
+}
+
 
   // Wire up buttons
   document.getElementById("saveApiKeyBtn").addEventListener("click", saveApiKey);
