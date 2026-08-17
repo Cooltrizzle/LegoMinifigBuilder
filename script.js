@@ -1,3 +1,62 @@
+// =========================
+// GLOBAL DATA STRUCTURES
+// =========================
+
+let translator = {};
+let minfigs = {};
+
+
+// =========================
+// LOAD CSV: MINFIGS
+// =========================
+
+function loadMinfigsCSV(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const rows = reader.result.split("\n").slice(1); // skip header
+    for (const row of rows) {
+      if (!row.trim()) continue;
+      const cols = row.split(",");
+      const id = cols[0];
+      const name = cols[1];
+      const num_parts = cols[2];
+      const img_url = cols[3];
+      minfigs[id] = { name, img_url, num_parts };
+    }
+    console.log("Minifigs loaded:", minfigs);
+  };
+  reader.readAsText(file);
+}
+
+
+// =========================
+// LOAD CSV: TRANSLATOR
+// =========================
+
+function loadTranslatorCSV(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    const rows = reader.result.split("\n").slice(1); // skip header
+    for (const row of rows) {
+      if (!row.trim()) continue;
+      const cols = row.split(",");
+      const id = cols[0];
+      const name = cols[1];
+      const img_url = cols[2];
+      const num_parts = cols[3];
+      const bricklink_id = cols[4];
+      translator[id] = { name, img_url, num_parts, bricklink_id };
+    }
+    console.log("Translator loaded:", translator);
+  };
+  reader.readAsText(file);
+}
+
+
+// =========================
+// PAGE LOAD
+// =========================
+
 document.addEventListener("DOMContentLoaded", () => {
 
   // Load saved API key
@@ -7,11 +66,28 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("apiKeyStatus").textContent = "API key loaded.";
   }
 
-  // Wire up buttons
+  // Buttons
   document.getElementById("saveApiKeyBtn").addEventListener("click", saveApiKey);
   document.getElementById("fetchFigBtn").addEventListener("click", fetchMinifigSearch);
   document.getElementById("elementSearchBtn").addEventListener("click", fetchMinifigsByElement);
+
+  // CSV loaders
+  document.getElementById("loadTranslatorBtn").addEventListener("click", () => {
+    const file = document.getElementById("translatorFile").files[0];
+    if (file) loadTranslatorCSV(file);
+  });
+
+  document.getElementById("loadMinfigsBtn").addEventListener("click", () => {
+    const file = document.getElementById("minfigsFile").files[0];
+    if (file) loadMinfigsCSV(file);
+  });
+
 });
+
+
+// =========================
+// SAVE API KEY
+// =========================
 
 function saveApiKey() {
   const key = document.getElementById("apiKeyInput").value.trim();
@@ -27,12 +103,9 @@ function saveApiKey() {
 }
 
 
-
-// ⭐ SCRAPER REMOVED — NO LONGER USED
-// (fetchBrickLinkFigID deleted completely)
-
-
-// ---------- Minifig → Parts ----------
+// =========================
+// MINIFIG SEARCH
+// =========================
 
 async function fetchMinifigSearch() {
   const apiKey = localStorage.getItem("rebrickable_api_key");
@@ -43,35 +116,37 @@ async function fetchMinifigSearch() {
   if (!apiKey) return output.textContent = "No API key saved.";
   if (!figNum) return output.textContent = "Enter a minifig ID.";
 
-  // ⭐ Fetch minifig metadata (name + image)
-  const metaUrl = `https://rebrickable.com/api/v3/lego/minifigs/${figNum}/?key=${apiKey}`;
-  let figName = "";
-  let figImg = "";
+  // =========================
+  // USE TRANSLATOR.CSV DATA
+  // =========================
 
-  try {
-    const metaRes = await fetch(metaUrl);
-    if (metaRes.ok) {
-      const metaData = await metaRes.json();
-      figName = metaData.name || "";
-      figImg = metaData.set_img_url || "";
-    }
-  } catch (err) {
-    console.log("Metadata fetch error:", err);
-  }
+  const t = translator[figNum];
 
-  // ⭐ Update summary box (BrickLink ID removed for now)
+  const figName = t?.name || "Unknown Minifig";
+  const figImg = t?.img_url || "";
+  const bricklinkFigID = t?.bricklink_id || "Not Assigned";
+  const numParts = t?.num_parts || "";
+
+  // =========================
+  // SUMMARY BOX
+  // =========================
+
   summary.innerHTML = `
     <div class="fig-summary-box">
       <img src="${figImg}" alt="${figName}" class="fig-summary-img">
       <div class="fig-summary-text">
-        <h2>${figName || "Minifig"}</h2>
-        <p><strong>BrickLink ID:</strong> Not Assigned</p>
+        <h2>${figName}</h2>
+        <p><strong>BrickLink ID:</strong> ${bricklinkFigID}</p>
         <p><strong>Rebrickable ID:</strong> ${figNum}</p>
+        <p><strong>Number of Parts:</strong> ${numParts}</p>
       </div>
     </div>
   `;
 
-  // ⭐ Fetch parts
+  // =========================
+  // FETCH PARTS FROM API
+  // =========================
+
   const url = `https://rebrickable.com/api/v3/lego/minifigs/${figNum}/parts/?key=${apiKey}`;
 
   try {
@@ -140,7 +215,9 @@ async function fetchMinifigSearch() {
 }
 
 
-// ---------- Element → Minifigs ----------
+// =========================
+// ELEMENT → MINIFIGS
+// =========================
 
 async function fetchMinifigsByElement() {
   const apiKey = localStorage.getItem("rebrickable_api_key");
