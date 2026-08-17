@@ -34,7 +34,7 @@ function saveApiKey() {
 
 // ---------- Minifig → Parts ----------
 
-async function fetchMinifigParts() {
+async function fetchMinifigSearch() {
   const apiKey = localStorage.getItem("rebrickable_api_key");
   const figNum = document.getElementById("figInput").value.trim();
   const output = document.getElementById("figOutput");
