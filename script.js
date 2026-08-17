@@ -58,6 +58,8 @@ async function fetchMinifigParts() {
             <th>Colour</th>
             <th>Qty</th>
             <th>Element ID</th>
+            <th>BrickLink Part</th>
+            <th>BrickLink Colour</th>
           </tr>
         </thead>
         <tbody>
