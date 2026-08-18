@@ -246,8 +246,14 @@ if (!bricklinkFigID || bricklinkFigID.trim() === "") {
     <button onclick="addBricklinkID('${figNum}')">Add</button>
   `;
 } else {
-  bricklinkField = bricklinkFigID;
+  bricklinkField = `
+    <a href="https://www.bricklink.com/v2/catalog/catalogitem.page?M=${bricklinkFigID}" 
+       target="_blank">
+      ${bricklinkFigID}
+    </a>
+  `;
 }
+
 
 
 summary.innerHTML = `
@@ -256,12 +262,15 @@ summary.innerHTML = `
     <div class="fig-summary-text">
       <h2>${figName}</h2>
       <p><strong>BrickLink ID:</strong> ${bricklinkField}</p>
-      <p><strong>Rebrickable ID:</strong> ${figNum}</p>
+      <p><strong>Rebrickable ID:</strong> 
+        <a href="https://rebrickable.com/minifigs/${figNum}/" target="_blank">
+          ${figNum}
+        </a>
+      </p>
       <p><strong>Number of Parts:</strong> ${numParts}</p>
     </div>
   </div>
 `;
-
 
   // ---------- Fetch parts from Rebrickable ----------
   const url = `https://rebrickable.com/api/v3/lego/minifigs/${figNum}/parts/?key=${apiKey}`;
