@@ -160,12 +160,14 @@ function downloadTranslatorCSV() {
 document.addEventListener("DOMContentLoaded", () => {
 
   // ---------- API key status ----------
-  const savedKey = localStorage.getItem("rebrickable_api_key");
-  if (savedKey) {
-    document.getElementById("apiKeyStatus").textContent = "Key already loaded";
-  } else {
-    document.getElementById("apiKeyStatus").textContent = "No key saved";
-  }
+ const savedKey = localStorage.getItem("rebrickable_api_key");
+const status = document.getElementById("apiKeyStatus");
+
+if (savedKey) {
+  status.innerHTML = `<span style="color:green;">✔</span> Key already loaded`;
+} else {
+  status.textContent = "No key saved";
+}
 
   // ---------- Wire up buttons ----------
   document.getElementById("saveApiKeyBtn").addEventListener("click", saveApiKey);
