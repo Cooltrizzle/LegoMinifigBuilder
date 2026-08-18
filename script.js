@@ -117,7 +117,11 @@ function filterMinifigIDs() {
   // Search Rebrickable IDs
   for (const id in minifigs) {
     if (id.toLowerCase().includes(input)) {
-      results.push({ id, name: minifigs[id].name });
+      results.push({
+        id,
+        blID: translator[id]?.bricklink_id || "",
+        name: minifigs[id].name
+      });
     }
   }
 
@@ -125,7 +129,11 @@ function filterMinifigIDs() {
   for (const id in translator) {
     const bl = translator[id].bricklink_id?.toLowerCase() || "";
     if (bl.includes(input)) {
-      results.push({ id, name: translator[id].name, blID: translator[id].bricklink_id });
+      results.push({
+        id,
+        blID: translator[id].bricklink_id,
+        name: translator[id].name
+      });
     }
   }
 
@@ -133,7 +141,11 @@ function filterMinifigIDs() {
   for (const id in translator) {
     const name = translator[id].name?.toLowerCase() || "";
     if (name.includes(input)) {
-      results.push({ id, name: translator[id].name, blID: translator[id].bricklink_id });
+      results.push({
+        id,
+        blID: translator[id].bricklink_id,
+        name: translator[id].name
+      });
     }
   }
 
@@ -143,16 +155,20 @@ function filterMinifigIDs() {
     return;
   }
 
+  // Build single-line items
   box.innerHTML = results.map(r => `
     <div class="filter-item" onclick="selectFilteredFig('${r.id}')">
-      <strong>${r.id}</strong>
-      ${r.blID ? ` / ${r.blID}` : ""}
-      <br><span style="font-size:12px;">${r.name}</span>
+      <strong>${r.id}${r.blID ? " / " + r.blID : ""}</strong> – ${r.name}
     </div>
   `).join("");
 
   box.style.display = "block";
 }
+
+
+//=================================
+//click select the filtered option
+//=================================
 
 function selectFilteredFig(id) {
   document.getElementById("figInput").value = id;
