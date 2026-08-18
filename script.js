@@ -115,9 +115,8 @@ function saveApiKey() {
   }
 
   localStorage.setItem("rebrickable_api_key", key);
-  status.textContent = "Key saved";
+  status.innerHTML = `<span style="color:green;">✔</span> Key saved`;
 }
-
 
 // ======================================================
 //  EXPORT UPDATED TRANSLATOR.CSV
