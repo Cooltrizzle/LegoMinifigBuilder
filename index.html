@@ -60,24 +60,38 @@
 
 
   <div class="section">
-    <h2>Minifig Search</h2>
-    <label>
-      Minifig ID (BrickLink or Rebrickable):
-      <input type="text" id="figInput">
-    </label>
-    <button id="fetchFigBtn">Fetch Parts</button>
-    <button id="updateTranslatorBtn">Update Database</button>
+  <h2>Minifig Search</h2>
 
+  <label>
+    Minifig ID (BrickLink or Rebrickable):
+  </label>
+
+  <!-- Search box + dropdown wrapper -->
+  <div style="position:relative; width:350px; margin-bottom:10px;">
     <input id="figInput" type="text" placeholder="Enter Minifig ID" style="width:350px;">
     <div id="figFilterList" class="filter-list"></div>
+  </div>
+
+  <button id="fetchFigBtn">Fetch Parts</button>
+  <button id="updateTranslatorBtn">Update Database</button>
+
+  <!-- ⭐ Minifig Summary Box -->
+  <div id="figSummary"></div>
+
+  <!-- Parts table output -->
+  <div id="figOutput"></div>
+</div>
+
     <style>
   .filter-list {
     position: absolute;
+    top: 100%;               /* directly under search box */
+    left: 0;
     background: white;
     border: 1px solid #ccc;
     max-height: 250px;
     overflow-y: auto;
-    width: 350px; /* match input width */
+    width: 100%;             /* EXACT width of search box */
     display: none;
     z-index: 20;
   }
@@ -92,6 +106,7 @@
     background: #eee;
   }
 </style>
+
   
 
 
