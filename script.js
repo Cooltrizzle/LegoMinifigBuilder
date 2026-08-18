@@ -96,7 +96,16 @@ function downloadTranslatorCSV() {
 
   for (const id in translator) {
     const t = translator[id];
-    csv += `${id},${t.name},${t.img_url},${t.num_parts},${t.bricklink_id}\n`;
+
+    const row = [
+      id,
+      t.name,
+      t.img_url,
+      t.num_parts,
+      t.bricklink_id
+    ].map(v => `"${v}"`).join(",");
+
+    csv += row + "\n";
   }
 
   const blob = new Blob([csv], { type: "text/csv" });
@@ -109,6 +118,7 @@ function downloadTranslatorCSV() {
 
   URL.revokeObjectURL(url);
 }
+
 
 
 // ======================================================
