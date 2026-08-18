@@ -68,26 +68,31 @@
     <button id="fetchFigBtn">Fetch Parts</button>
     <button id="updateTranslatorBtn">Update Database</button>
 
+    <input id="figInput" type="text" placeholder="Enter Minifig ID" style="width:350px;">
     <div id="figFilterList" class="filter-list"></div>
     <style>
   .filter-list {
     position: absolute;
     background: white;
     border: 1px solid #ccc;
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
-    width: 250px;
+    width: 350px; /* match input width */
     display: none;
     z-index: 20;
   }
   .filter-item {
-    padding: 6px;
+    padding: 6px 8px;
     cursor: pointer;
+    white-space: nowrap;       /* force single line */
+    overflow: hidden;          /* hide overflow */
+    text-overflow: ellipsis;   /* add ... if too long */
   }
   .filter-item:hover {
     background: #eee;
   }
-</style>   
+</style>
+  
 
 
     <!-- ⭐ Minifig Summary Box -->
