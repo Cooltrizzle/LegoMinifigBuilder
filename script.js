@@ -6,6 +6,39 @@ let translator = {};   // Holds merged translator data (including BrickLink IDs)
 let minifigs = {};      // Holds raw minifigs.csv data
 
 
+//=======================================================
+// CSV PARSER
+//=======================================================
+function parseCSVLine(line) {
+  const result = [];
+  let current = "";
+  let insideQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"' && insideQuotes) {
+      // Look ahead: escaped quote?
+      if (line[i + 1] === '"') {
+        current += '"';
+        i++; // skip next quote
+      } else {
+        insideQuotes = false;
+      }
+    } else if (char === '"' && !insideQuotes) {
+      insideQuotes = true;
+    } else if (char === ',' && !insideQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  result.push(current);
+  return result;
+}
+
 // ======================================================
 //  CSV LOADERS
 // ======================================================
@@ -15,7 +48,7 @@ function loadMinifigsText(text) {
   const rows = text.split("\n").slice(1);
   for (const row of rows) {
     if (!row.trim()) continue;
-    const cols = row.split(",");
+    const cols = parseCSVLine(row);
     const id = cols[0];
     const name = cols[1];
     const num_parts = cols[2];
@@ -30,7 +63,7 @@ function loadTranslatorText(text) {
   const rows = text.split("\n").slice(1);
   for (const row of rows) {
     if (!row.trim()) continue;
-    const cols = row.split(",");
+    const cols = parseCSVLine(row);
     const id = cols[0];
     const name = cols[1];
     const img_url = cols[2];
@@ -40,7 +73,6 @@ function loadTranslatorText(text) {
   }
   console.log("Translator loaded:", translator);
 }
-
 
 // ======================================================
 //  SYNC: MERGE MINiFIGS INTO TRANSLATOR
