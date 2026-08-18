@@ -39,6 +39,37 @@ function parseCSVLine(line) {
   return result;
 }
 
+//======================================
+// BRICKLINK UPDATE ID FUNCTION
+//======================================
+function addBricklinkID(figNum) {
+  const input = document.getElementById("blInput");
+  const newID = input.value.trim();
+
+  if (!newID) {
+    alert("Please enter a BrickLink ID.");
+    return;
+  }
+
+  // Update translator memory
+  if (translator[figNum]) {
+    translator[figNum].bricklink_id = newID;
+  } else {
+    // Should never happen, but safe fallback
+    translator[figNum] = {
+      name: "",
+      img_url: "",
+      num_parts: "",
+      bricklink_id: newID
+    };
+  }
+
+  // Refresh summary box
+  fetchMinifigSearch();
+}
+
+
+
 // ======================================================
 //  CSV LOADERS
 // ======================================================
@@ -216,18 +247,32 @@ async function fetchMinifigSearch() {
   const bricklinkFigID = t?.bricklink_id || "Not Assigned";
   const numParts = t?.num_parts || "";
 
-  // ---------- Summary box ----------
-  summary.innerHTML = `
-    <div class="fig-summary-box">
-      <img src="${figImg}" alt="${figName}" class="fig-summary-img">
-      <div class="fig-summary-text">
-        <h2>${figName}</h2>
-        <p><strong>BrickLink ID:</strong> ${bricklinkFigID}</p>
-        <p><strong>Rebrickable ID:</strong> ${figNum}</p>
-        <p><strong>Number of Parts:</strong> ${numParts}</p>
-      </div>
-    </div>
+// =========================
+// SUMMARY BOX (with BL ID editor)
+// =========================
+
+let bricklinkField = "";
+
+if (!bricklinkFigID || bricklinkFigID === "Not Assigned") {
+  bricklinkField = `
+    <input type="text" id="blInput" placeholder="Enter BrickLink ID" style="width:120px;">
+    <button onclick="addBricklinkID('${figNum}')">Add</button>
   `;
+} else {
+  bricklinkField = bricklinkFigID;
+}
+
+summary.innerHTML = `
+  <div class="fig-summary-box">
+    <img src="${figImg}" alt="${figName}" class="fig-summary-img">
+    <div class="fig-summary-text">
+      <h2>${figName}</h2>
+      <p><strong>BrickLink ID:</strong> ${bricklinkField}</p>
+      <p><strong>Rebrickable ID:</strong> ${figNum}</p>
+      <p><strong>Number of Parts:</strong> ${numParts}</p>
+    </div>
+  </div>
+`;
 
   // ---------- Fetch parts from Rebrickable ----------
   const url = `https://rebrickable.com/api/v3/lego/minifigs/${figNum}/parts/?key=${apiKey}`;
