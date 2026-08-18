@@ -3,15 +3,15 @@
 // ======================================================
 
 let translator = {};   // Holds merged translator data (including BrickLink IDs)
-let minfigs = {};      // Holds raw minifigs.csv data
+let minifigs = {};      // Holds raw minifigs.csv data
 
 
 // ======================================================
 //  CSV LOADERS
 // ======================================================
 
-// ---------- Load minfigs.csv ----------
-function loadMinfigsText(text) {
+// ---------- Load minifigs.csv ----------
+function loadMinifigsText(text) {
   const rows = text.split("\n").slice(1);
   for (const row of rows) {
     if (!row.trim()) continue;
@@ -20,9 +20,9 @@ function loadMinfigsText(text) {
     const name = cols[1];
     const num_parts = cols[2];
     const img_url = cols[3];
-    minfigs[id] = { name, img_url, num_parts };
+    minifigs[id] = { name, img_url, num_parts };
   }
-  console.log("Minifigs loaded:", minfigs);
+  console.log("Minifigs loaded:", minifigs);
 }
 
 // ---------- Load translator.csv ----------
@@ -43,17 +43,17 @@ function loadTranslatorText(text) {
 
 
 // ======================================================
-//  SYNC: MERGE MINFIGS INTO TRANSLATOR
+//  SYNC: MERGE MINiFIGS INTO TRANSLATOR
 // ======================================================
 
-function syncTranslatorWithMinfigs() {
-  for (const id in minfigs) {
+function syncTranslatorWithMinifigs() {
+  for (const id in minifigs) {
     if (!translator[id]) {
-      // Add missing entry from minfigs.csv
+      // Add missing entry from minifigs.csv
       translator[id] = {
-        name: minfigs[id].name,
-        img_url: minfigs[id].img_url,
-        num_parts: minfigs[id].num_parts,
+        name: minifigs[id].name,
+        img_url: minifigs[id].img_url,
+        num_parts: minifigs[id].num_parts,
         bricklink_id: ""   // blank until manually filled
       };
     }
@@ -133,13 +133,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---------- AUTO LOAD CSV FILES ----------
   Promise.all([
-    fetch("data/minfigs.csv").then(r => r.text()),
+    fetch("data/minifigs.csv").then(r => r.text()),
     fetch("data/translator.csv").then(r => r.text())
   ])
-  .then(([minfigsText, translatorText]) => {
-    loadMinfigsText(minfigsText);
+  .then(([minifigsText, translatorText]) => {
+    loadMinifigsText(minifigsText);
     loadTranslatorText(translatorText);
-    syncTranslatorWithMinfigs();   // merge missing figs
+    syncTranslatorWithMinifigs();   // merge missing figs
   })
   .catch(err => console.error("CSV load error:", err));
 });
