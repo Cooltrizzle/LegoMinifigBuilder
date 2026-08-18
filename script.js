@@ -51,6 +51,13 @@ function addBricklinkID(figNum) {
     return;
   }
 
+  translator[figNum].bricklink_id = newID;
+
+  // Refresh summary box
+  fetchMinifigSearch();
+}
+
+  
   // Update translator memory
   if (translator[figNum]) {
     translator[figNum].bricklink_id = newID;
@@ -274,6 +281,7 @@ summary.innerHTML = `
     </div>
   </div>
 `;
+
 
   // ---------- Fetch parts from Rebrickable ----------
   const url = `https://rebrickable.com/api/v3/lego/minifigs/${figNum}/parts/?key=${apiKey}`;
