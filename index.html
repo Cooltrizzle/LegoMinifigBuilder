@@ -68,6 +68,27 @@
     <button id="fetchFigBtn">Fetch Parts</button>
     <button id="updateTranslatorBtn">Update Database</button>
 
+    <div id="figFilterList" class="filter-list"></div>
+    <style>
+  .filter-list {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 250px;
+    display: none;
+    z-index: 20;
+  }
+  .filter-item {
+    padding: 6px;
+    cursor: pointer;
+  }
+  .filter-item:hover {
+    background: #eee;
+  }
+</style>   
+
 
     <!-- ⭐ Minifig Summary Box -->
     <div id="figSummary"></div>
