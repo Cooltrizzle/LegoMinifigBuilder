@@ -57,26 +57,6 @@ function addBricklinkID(figNum) {
   fetchMinifigSearch();
 }
 
-  
-  // Update translator memory
-  if (translator[figNum]) {
-    translator[figNum].bricklink_id = newID;
-  } else {
-    // Should never happen, but safe fallback
-    translator[figNum] = {
-      name: "",
-      img_url: "",
-      num_parts: "",
-      bricklink_id: newID
-    };
-  }
-
-  // Refresh summary box
-  fetchMinifigSearch();
-}
-
-
-
 // ======================================================
 //  CSV LOADERS
 // ======================================================
@@ -251,7 +231,7 @@ async function fetchMinifigSearch() {
 
   const figName = t?.name || "Unknown Minifig";
   const figImg = t?.img_url || "";
-  const bricklinkFigID = t?.bricklink_id || "Not Assigned";
+  const bricklinkFigID = t?.bricklink_id || "";
   const numParts = t?.num_parts || "";
 
 // =========================
