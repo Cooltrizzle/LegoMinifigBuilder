@@ -154,6 +154,14 @@ function filterMinifigIDs() {
   box.style.display = "block";
 }
 
+function selectFilteredFig(id) {
+  document.getElementById("figInput").value = id;
+  document.getElementById("figFilterList").style.display = "none";
+  fetchMinifigSearch();
+}
+
+
+
 // ======================================================
 //  CSV LOADERS
 // ======================================================
