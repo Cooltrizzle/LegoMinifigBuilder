@@ -98,6 +98,62 @@ function addBricklinkID(figNum) {
   fetchMinifigSearch();
 }
 
+//==========================================
+//FILTER MINIFIGS ID
+//==========================================
+
+function filterMinifigIDs() {
+  const input = document.getElementById("figInput").value.trim().toLowerCase();
+  const box = document.getElementById("figFilterList");
+
+  if (input.length === 0) {
+    box.style.display = "none";
+    box.innerHTML = "";
+    return;
+  }
+
+  let results = [];
+
+  // Search Rebrickable IDs
+  for (const id in minifigs) {
+    if (id.toLowerCase().includes(input)) {
+      results.push({ id, name: minifigs[id].name });
+    }
+  }
+
+  // Search BrickLink IDs
+  for (const id in translator) {
+    const bl = translator[id].bricklink_id?.toLowerCase() || "";
+    if (bl.includes(input)) {
+      results.push({ id, name: translator[id].name, blID: translator[id].bricklink_id });
+    }
+  }
+
+  // Search names
+  for (const id in translator) {
+    const name = translator[id].name?.toLowerCase() || "";
+    if (name.includes(input)) {
+      results.push({ id, name: translator[id].name, blID: translator[id].bricklink_id });
+    }
+  }
+
+  if (results.length === 0) {
+    box.style.display = "none";
+    box.innerHTML = "";
+    return;
+  }
+
+  box.innerHTML = results.map(r => `
+    <div class="filter-item" onclick="selectFilteredFig('${r.id}')">
+      <strong>${r.id}</strong>
+      ${r.blID ? ` / ${r.blID}` : ""}
+      <br><span style="font-size:12px;">${r.name}</span>
+    </div>
+  `).join("");
+
+  box.style.display = "block";
+}
+
 // ======================================================
 //  CSV LOADERS
 // ======================================================
@@ -241,6 +297,8 @@ if (savedKey) {
   document.getElementById("fetchFigBtn").addEventListener("click", fetchMinifigSearch);
   document.getElementById("elementSearchBtn").addEventListener("click", fetchMinifigsByElement);
   document.getElementById("updateTranslatorBtn").addEventListener("click", downloadTranslatorCSV);
+  document.getElementById("figInput").addEventListener("input", filterMinifigIDs);
+
 
   // ---------- AUTO LOAD CSV FILES ----------
   Promise.all([
