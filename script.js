@@ -108,6 +108,7 @@ function toggleApiSection() {
 function saveApiKey() {
   const key = document.getElementById("apiKeyInput").value.trim();
   const status = document.getElementById("apiKeyStatus");
+  const tick = document.getElementById("apiKeyTick");
 
   if (!key) {
     status.textContent = "Please enter an API key.";
@@ -115,8 +116,11 @@ function saveApiKey() {
   }
 
   localStorage.setItem("rebrickable_api_key", key);
+
   status.innerHTML = `<span style="color:green;">✔</span> Key saved`;
+  tick.innerHTML = `<span style="color:green;">✔</span>`;
 }
+
 
 // ======================================================
 //  EXPORT UPDATED TRANSLATOR.CSV
@@ -159,13 +163,16 @@ function downloadTranslatorCSV() {
 document.addEventListener("DOMContentLoaded", () => {
 
   // ---------- API key status ----------
- const savedKey = localStorage.getItem("rebrickable_api_key");
+const savedKey = localStorage.getItem("rebrickable_api_key");
 const status = document.getElementById("apiKeyStatus");
+const tick = document.getElementById("apiKeyTick");
 
 if (savedKey) {
   status.innerHTML = `<span style="color:green;">✔</span> Key already loaded`;
+  tick.innerHTML = `<span style="color:green;">✔</span>`;
 } else {
   status.textContent = "No key saved";
+  tick.textContent = "";
 }
 
   // ---------- Wire up buttons ----------
