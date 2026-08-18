@@ -1,15 +1,16 @@
-// =========================
-// GLOBAL DATA STRUCTURES
-// =========================
+// ======================================================
+//  GLOBAL DATA STRUCTURES
+// ======================================================
 
-let translator = {};
-let minfigs = {};
+let translator = {};   // Holds merged translator data (including BrickLink IDs)
+let minfigs = {};      // Holds raw minifigs.csv data
 
 
-// =========================
-// LOAD CSV: MINFIGS
-// =========================
+// ======================================================
+//  CSV LOADERS
+// ======================================================
 
+// ---------- Load minfigs.csv ----------
 function loadMinfigsText(text) {
   const rows = text.split("\n").slice(1);
   for (const row of rows) {
@@ -24,11 +25,7 @@ function loadMinfigsText(text) {
   console.log("Minifigs loaded:", minfigs);
 }
 
-
-// =========================
-// LOAD CSV: TRANSLATOR
-// =========================
-
+// ---------- Load translator.csv ----------
 function loadTranslatorText(text) {
   const rows = text.split("\n").slice(1);
   for (const row of rows) {
@@ -44,19 +41,57 @@ function loadTranslatorText(text) {
   console.log("Translator loaded:", translator);
 }
 
-//==========================
-// TOGGLE API KEY
-//==========================
+
+// ======================================================
+//  SYNC: MERGE MINFIGS INTO TRANSLATOR
+// ======================================================
+
+function syncTranslatorWithMinfigs() {
+  for (const id in minfigs) {
+    if (!translator[id]) {
+      // Add missing entry from minfigs.csv
+      translator[id] = {
+        name: minfigs[id].name,
+        img_url: minfigs[id].img_url,
+        num_parts: minfigs[id].num_parts,
+        bricklink_id: ""   // blank until manually filled
+      };
+    }
+  }
+  console.log("Translator synced:", translator);
+}
+
+
+// ======================================================
+//  API KEY SECTION (COLLAPSIBLE)
+// ======================================================
+
+// ---------- Toggle API key visibility ----------
 function toggleApiSection() {
   const sec = document.getElementById("apiSection");
   sec.style.display = sec.style.display === "none" ? "block" : "none";
 }
 
-//================================
-  // DOWNLOAD TRANSLATOR CSV
-  //================================
-  
-  function downloadTranslatorCSV() {
+// ---------- Save API key ----------
+function saveApiKey() {
+  const key = document.getElementById("apiKeyInput").value.trim();
+  const status = document.getElementById("apiKeyStatus");
+
+  if (!key) {
+    status.textContent = "Please enter an API key.";
+    return;
+  }
+
+  localStorage.setItem("rebrickable_api_key", key);
+  status.textContent = "Key saved";
+}
+
+
+// ======================================================
+//  EXPORT UPDATED TRANSLATOR.CSV
+// ======================================================
+
+function downloadTranslatorCSV() {
   let csv = "rebrickable_id,name,img_url,num_parts,bricklink_id\n";
 
   for (const id in translator) {
@@ -75,63 +110,44 @@ function toggleApiSection() {
   URL.revokeObjectURL(url);
 }
 
-// =========================
-// PAGE LOAD
-// =========================
+
+// ======================================================
+//  PAGE LOAD INITIALIZATION
+// ======================================================
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Load saved API key
-const savedKey = localStorage.getItem("rebrickable_api_key");
+  // ---------- API key status ----------
+  const savedKey = localStorage.getItem("rebrickable_api_key");
+  if (savedKey) {
+    document.getElementById("apiKeyStatus").textContent = "Key already loaded";
+  } else {
+    document.getElementById("apiKeyStatus").textContent = "No key saved";
+  }
 
-if (savedKey) {
-  document.getElementById("apiKeyStatus").textContent = "Key already loaded";
-} else {
-  document.getElementById("apiKeyStatus").textContent = "No key saved";
-}
-
-
-  // Wire up buttons
+  // ---------- Wire up buttons ----------
   document.getElementById("saveApiKeyBtn").addEventListener("click", saveApiKey);
   document.getElementById("fetchFigBtn").addEventListener("click", fetchMinifigSearch);
   document.getElementById("elementSearchBtn").addEventListener("click", fetchMinifigsByElement);
   document.getElementById("updateTranslatorBtn").addEventListener("click", downloadTranslatorCSV);
 
-
-  // ⭐ AUTO-LOAD CSV FILES FROM /data
-  fetch("data/translator.csv")
-    .then(r => r.text())
-    .then(text => loadTranslatorText(text))
-    .catch(err => console.error("Translator CSV load error:", err));
-
-  fetch("data/minfigs.csv")
-    .then(r => r.text())
-    .then(text => loadMinfigsText(text))
-    .catch(err => console.error("Minfigs CSV load error:", err));
+  // ---------- AUTO LOAD CSV FILES ----------
+  Promise.all([
+    fetch("data/minfigs.csv").then(r => r.text()),
+    fetch("data/translator.csv").then(r => r.text())
+  ])
+  .then(([minfigsText, translatorText]) => {
+    loadMinfigsText(minfigsText);
+    loadTranslatorText(translatorText);
+    syncTranslatorWithMinfigs();   // merge missing figs
+  })
+  .catch(err => console.error("CSV load error:", err));
 });
 
 
-// =========================
-// SAVE API KEY
-// =========================
-
-function saveApiKey() {
-  const key = document.getElementById("apiKeyInput").value.trim();
-  const status = document.getElementById("apiKeyStatus");
-
-  if (!key) {
-    status.textContent = "Please enter an API key.";
-    return;
-  }
-
-  localStorage.setItem("rebrickable_api_key", key);
-  status.textContent = "API key saved.";
-}
-
-
-// =========================
-// MINIFIG SEARCH
-// =========================
+// ======================================================
+//  MINIFIG SEARCH
+// ======================================================
 
 async function fetchMinifigSearch() {
   const apiKey = localStorage.getItem("rebrickable_api_key");
@@ -142,38 +158,28 @@ async function fetchMinifigSearch() {
   if (!apiKey) return output.textContent = "No API key saved.";
   if (!figNum) return output.textContent = "Enter a minifig ID.";
 
-  // =========================
-// USE TRANSLATOR.CSV DATA
-// =========================
+  // ---------- Lookup from translator ----------
+  const t = translator[figNum];
 
-const t = translator[figNum];
+  const figName = t?.name || "Unknown Minifig";
+  const figImg = t?.img_url || "";
+  const bricklinkFigID = t?.bricklink_id || "Not Assigned";
+  const numParts = t?.num_parts || "";
 
-const figName = t?.name || "Unknown Minifig";
-const figImg = t?.img_url || "";
-const bricklinkFigID = t?.bricklink_id || "Not Assigned";
-const numParts = t?.num_parts || "";
-
-// =========================
-// SUMMARY BOX
-// =========================
-
-summary.innerHTML = `
-  <div class="fig-summary-box">
-    <img src="${figImg}" alt="${figName}" class="fig-summary-img">
-    <div class="fig-summary-text">
-      <h2>${figName}</h2>
-      <p><strong>BrickLink ID:</strong> ${bricklinkFigID}</p>
-      <p><strong>Rebrickable ID:</strong> ${figNum}</p>
-      <p><strong>Number of Parts:</strong> ${numParts}</p>
+  // ---------- Summary box ----------
+  summary.innerHTML = `
+    <div class="fig-summary-box">
+      <img src="${figImg}" alt="${figName}" class="fig-summary-img">
+      <div class="fig-summary-text">
+        <h2>${figName}</h2>
+        <p><strong>BrickLink ID:</strong> ${bricklinkFigID}</p>
+        <p><strong>Rebrickable ID:</strong> ${figNum}</p>
+        <p><strong>Number of Parts:</strong> ${numParts}</p>
+      </div>
     </div>
-  </div>
-`;
+  `;
 
-
-  // =========================
-  // FETCH PARTS FROM API
-  // =========================
-
+  // ---------- Fetch parts from Rebrickable ----------
   const url = `https://rebrickable.com/api/v3/lego/minifigs/${figNum}/parts/?key=${apiKey}`;
 
   try {
@@ -242,9 +248,9 @@ summary.innerHTML = `
 }
 
 
-// =========================
-// ELEMENT → MINIFIGS
-// =========================
+// ======================================================
+//  ELEMENT → MINIFIGS SEARCH
+// ======================================================
 
 async function fetchMinifigsByElement() {
   const apiKey = localStorage.getItem("rebrickable_api_key");
@@ -296,5 +302,4 @@ async function fetchMinifigsByElement() {
   } catch (err) {
     output.textContent = `Fetch error: ${err}`;
   }
-
 }
