@@ -176,6 +176,14 @@ function selectFilteredFig(id) {
   fetchMinifigSearch();
 }
 
+// ======================================================
+//  reomve embedded lines
+// ======================================================
+function removeEmbeddedNewlines(line) {
+  // Remove ANY newline characters inside a CSV row
+  return line.replace(/\r?\n|\r/g, "");
+}
+
 
 
 // ======================================================
@@ -185,35 +193,61 @@ function selectFilteredFig(id) {
 // ---------- Load minifigs.csv ----------
 function loadMinifigsText(text) {
   const rows = text.split("\n").slice(1);
-  for (const row of rows) {
+
+  for (let row of rows) {
     if (!row.trim()) continue;
-    const clean = sanitizeCSVLine(row);
-    const cols = parseCSVLine(clean);
-    const id = cols[0];
-    const name = cols[1];
-    const num_parts = cols[2];
-    const img_url = cols[3];
+
+    // 1. Remove embedded newlines
+    row = removeEmbeddedNewlines(row);
+
+    // 2. Fix broken quoted fields
+    row = sanitizeCSVLine(row);
+
+    // 3. Parse CSV
+    const cols = parseCSVLine(row);
+
+    // 4. Trim fields
+    const id = cols[0]?.trim();
+    const name = cols[1]?.trim();
+    const img_url = cols[2]?.trim();
+    const num_parts = cols[3]?.trim();
+
     minifigs[id] = { name, img_url, num_parts };
   }
+
   console.log("Minifigs loaded:", minifigs);
 }
+
 
 // ---------- Load translator.csv ----------
 function loadTranslatorText(text) {
   const rows = text.split("\n").slice(1);
-  for (const row of rows) {
+
+  for (let row of rows) {
     if (!row.trim()) continue;
-    const clean = sanitizeCSVLine(row);
-    const cols = parseCSVLine(clean);
-    const id = cols[0];
-    const name = cols[1];
-    const img_url = cols[2];
-    const num_parts = cols[3];
-    const bricklink_id = cols[4];
+
+    // 1. Remove embedded newlines
+    row = removeEmbeddedNewlines(row);
+
+    // 2. Fix broken quoted fields
+    row = sanitizeCSVLine(row);
+
+    // 3. Parse CSV
+    const cols = parseCSVLine(row);
+
+    // 4. Trim fields
+    const id = cols[0]?.trim();
+    const name = cols[1]?.trim();
+    const img_url = cols[2]?.trim();
+    const num_parts = cols[3]?.trim();
+    const bricklink_id = cols[4]?.trim();
+
     translator[id] = { name, img_url, num_parts, bricklink_id };
   }
+
   console.log("Translator loaded:", translator);
 }
+
 
 // ======================================================
 //  SYNC: MERGE MINiFIGS INTO TRANSLATOR
