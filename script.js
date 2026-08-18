@@ -251,9 +251,9 @@ async function fetchMinifigSearch() {
 // SUMMARY BOX (with BL ID editor)
 // =========================
 
-let bricklinkField = "";
+let bricklinkField;
 
-if (!bricklinkFigID || bricklinkFigID === "Not Assigned") {
+if (!bricklinkFigID || bricklinkFigID.trim() === "") {
   bricklinkField = `
     <input type="text" id="blInput" placeholder="Enter BrickLink ID" style="width:120px;">
     <button onclick="addBricklinkID('${figNum}')">Add</button>
@@ -261,6 +261,7 @@ if (!bricklinkFigID || bricklinkFigID === "Not Assigned") {
 } else {
   bricklinkField = bricklinkFigID;
 }
+
 
 summary.innerHTML = `
   <div class="fig-summary-box">
