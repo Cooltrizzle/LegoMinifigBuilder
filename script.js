@@ -5,7 +5,6 @@
 let translator = {};   // Holds merged translator data (including BrickLink IDs)
 let minifigs = {};      // Holds raw minifigs.csv data
 
-
 //=======================================================
 // CSV PARSER
 //=======================================================
@@ -132,6 +131,28 @@ function filterMinifigIDs() {
 function selectFilteredFig(id) {
   document.getElementById("figInput").value = id;
   document.getElementById("figFilterList").style.display = "none";
+  fetchMinifigSearch();
+}
+
+//================================
+// Fetch Next missing Fig
+//================================
+function fetchNextMissingFig() {
+  // Get all IDs sorted numerically
+  const ids = Object.keys(translator).sort();
+
+  // Find the first one with no BrickLink ID
+  const next = ids.find(id => !translator[id].bricklink_id || translator[id].bricklink_id.trim() === "");
+
+  if (!next) {
+    alert("All minifigs have BrickLink IDs assigned!");
+    return;
+  }
+
+  // Put it into the search box
+  document.getElementById("figInput").value = next;
+
+  // Trigger the normal search
   fetchMinifigSearch();
 }
 
@@ -287,10 +308,11 @@ if (savedKey) {
 
   // ---------- Wire up buttons ----------
   document.getElementById("saveApiKeyBtn").addEventListener("click", saveApiKey);
-  document.getElementById("fetchFigBtn").addEventListener("click", fetchMinifigSearch);
   document.getElementById("elementSearchBtn").addEventListener("click", fetchMinifigsByElement);
   document.getElementById("updateTranslatorBtn").addEventListener("click", downloadTranslatorCSV);
   document.getElementById("figInput").addEventListener("input", filterMinifigIDs);
+  document.getElementById("fetchNextMissingBtn").addEventListener("click", fetchNextMissingFig);
+
 
 
   // ---------- AUTO LOAD CSV FILES ----------
