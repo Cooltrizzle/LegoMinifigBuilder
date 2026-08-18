@@ -39,47 +39,6 @@ function parseCSVLine(line) {
   return result;
 }
 
-// ======================================================
-//  CSV SANITIZER
-// ======================================================
-
-function sanitizeCSVLine(line) {
-  // If the line contains quotes but does not properly close them,
-  // we wrap the entire name field in quotes.
-
-  const parts = line.split(",");
-
-  // If the second column starts with a quote but doesn't end with one,
-  // rebuild the line so the name field is properly quoted.
-  if (parts[1] && parts[1].startsWith('"') && !parts[1].endsWith('"')) {
-    let nameField = parts[1];
-    let i = 2;
-
-    // Keep adding parts until we find the closing quote
-    while (i < parts.length && !parts[i].endsWith('"')) {
-      nameField += "," + parts[i];
-      i++;
-    }
-
-    // Add the final part containing the closing quote
-    if (i < parts.length) {
-      nameField += "," + parts[i];
-    }
-
-    // Rebuild the full line
-    const rebuilt = [
-      parts[0],          // ID
-      nameField,         // fixed name
-      parts[i + 1],      // num_parts
-      parts[i + 2]       // img_url
-    ].join(",");
-
-    return rebuilt;
-  }
-
-  return line;
-}
-
 //======================================
 // BRICKLINK UPDATE ID FUNCTION
 //======================================
@@ -177,16 +136,6 @@ function selectFilteredFig(id) {
 }
 
 // ======================================================
-//  reomve embedded lines
-// ======================================================
-function removeEmbeddedNewlines(line) {
-  // Remove ANY newline characters inside a CSV row
-  return line.replace(/\r?\n|\r/g, "");
-}
-
-
-
-// ======================================================
 //  CSV LOADERS
 // ======================================================
 
@@ -197,16 +146,8 @@ function loadMinifigsText(text) {
   for (let row of rows) {
     if (!row.trim()) continue;
 
-    // 1. Remove embedded newlines
-    row = removeEmbeddedNewlines(row);
-
-    // 2. Fix broken quoted fields
-    row = sanitizeCSVLine(row);
-
-    // 3. Parse CSV
     const cols = parseCSVLine(row);
 
-    // 4. Trim fields
     const id = cols[0]?.trim();
     const name = cols[1]?.trim();
     const img_url = cols[2]?.trim();
@@ -219,6 +160,7 @@ function loadMinifigsText(text) {
 }
 
 
+
 // ---------- Load translator.csv ----------
 function loadTranslatorText(text) {
   const rows = text.split("\n").slice(1);
@@ -226,16 +168,8 @@ function loadTranslatorText(text) {
   for (let row of rows) {
     if (!row.trim()) continue;
 
-    // 1. Remove embedded newlines
-    row = removeEmbeddedNewlines(row);
-
-    // 2. Fix broken quoted fields
-    row = sanitizeCSVLine(row);
-
-    // 3. Parse CSV
     const cols = parseCSVLine(row);
 
-    // 4. Trim fields
     const id = cols[0]?.trim();
     const name = cols[1]?.trim();
     const img_url = cols[2]?.trim();
@@ -247,6 +181,7 @@ function loadTranslatorText(text) {
 
   console.log("Translator loaded:", translator);
 }
+
 
 
 // ======================================================
